@@ -1,0 +1,65 @@
+{
+  "name": "n8n-nodes-parse-bot",
+  "version": "0.1.0",
+  "description": "Parse.bot web APIs for n8n and AI agents",
+  "license": "MIT",
+  "homepage": "https://github.com/khmuhtadin/n8n-nodes-parse-bot#readme",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "parse",
+    "scraping",
+    "ai"
+  ],
+  "author": {
+    "name": "khmuhtadin",
+    "email": "contact@khmuhtadin.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khmuhtadin/n8n-nodes-parse-bot.git"
+  },
+  "scripts": {
+    "build": "n8n-node build",
+    "build:watch": "tsc --watch",
+    "dev": "n8n-node dev",
+    "lint": "n8n-node lint",
+    "lint:fix": "n8n-node lint --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "release": "n8n-node release",
+    "prepublishOnly": "n8n-node prerelease"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "strict": true,
+    "credentials": [
+      "dist/credentials/ParseBotApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/ParseBot/ParseBot.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@n8n/node-cli": "^0.57.3",
+    "eslint": "9.32.0",
+    "prettier": "3.6.2",
+    "release-it": "^19.0.4",
+    "typescript": "5.9.2"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
+  "bugs": {
+    "url": "https://github.com/khmuhtadin/n8n-nodes-parse-bot/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

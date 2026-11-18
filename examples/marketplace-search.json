@@ -1,0 +1,45 @@
+{
+  "name": "Search Parse marketplace",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "start",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "query": "books.toscrape.com",
+        "resource": "marketplace"
+      },
+      "id": "parse",
+      "name": "Parse.bot",
+      "type": "n8n-nodes-parse-bot.parseBot",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse.bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {}
+}
