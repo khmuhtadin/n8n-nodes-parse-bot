@@ -22,3 +22,7 @@ Import `examples/marketplace-search.json`, select your credentials and run it to
 Khairul Muhtadin, n8n Ambassador ([LinkedIn](https://linkedin.com/in/khmuhtadin)).
 
 **Known issue:** Parse's input-response endpoint rejected the documented `user_response` payload during live testing on 18 November 2026, requiring an undocumented `request_id` and encrypted envelope. The Provide Task Input operation follows the published schema but is not currently verified to work; use the Parse dashboard until the API documentation is clarified.
+
+## Workflow template
+
+[`examples/template-parse-bot-new-listings-watch.json`](examples/template-parse-bot-new-listings-watch.json): **Watch a website for new listings with Parse.bot, Google Sheets and Slack**. Import it in n8n (Workflows > Import from file). Setup steps are in the yellow sticky note.

@@ -1,0 +1,300 @@
+{
+  "name": "Watch a website for new listings with Parse.bot, Google Sheets and Slack",
+  "nodes": [
+    {
+      "id": "n001-0000-4000-8000-000000000000",
+      "name": "Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "content": "## Watch a website for new listings with Parse.bot, Google Sheets and Slack\n\nMany sites you care about have no API. Parse.bot turns a website into one, and this workflow checks it on a schedule. New listings are saved to Google Sheets and posted to Slack, and items you have already seen are skipped. The example uses the public books.toscrape.com API from the Parse.bot marketplace.\n\n### How it works\n1. A schedule calls a Parse.bot API endpoint (for example list_books, page 1).\n2. The list in the response is split into one item per listing.\n3. Listings already seen in earlier runs are dropped.\n4. New listings are added to a Google Sheet.\n5. Slack gets one message with the count and titles.\n\n### Setup steps\n- [ ] Install the community node **n8n-nodes-parse-bot** (Settings > Community nodes)\n- [ ] Add your Parse.bot API key (parse.bot dashboard)\n- [ ] Find or build an API for your site, then copy its scraper ID and endpoint name\n- [ ] Adjust the list field in **One item per listing** to match the response\n- [ ] Create a sheet **Listings** (seen_at, title, price, url) and connect Sheets and Slack\n\n### Customization\nAdd filters (price, keyword) before saving, or call a details endpoint for each new listing.",
+        "width": 560,
+        "height": 720
+      }
+    },
+    {
+      "id": "n002-0000-4000-8000-000000000000",
+      "name": "1. Fetch listings",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        620,
+        0
+      ],
+      "parameters": {
+        "content": "## 1. Fetch listings\n\nCalls your Parse.bot website API on a schedule and splits the response into one item per listing.",
+        "width": 840,
+        "height": 370,
+        "color": 7
+      }
+    },
+    {
+      "id": "n006-0000-4000-8000-000000000000",
+      "name": "2. Keep only new ones",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        0
+      ],
+      "parameters": {
+        "content": "## 2. Keep only new ones\n\nDrops listings whose URL was already seen in a previous run, using n8n built-in deduplication.",
+        "width": 320,
+        "height": 370,
+        "color": 7
+      }
+    },
+    {
+      "id": "n008-0000-4000-8000-000000000000",
+      "name": "3. Save and alert",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1860,
+        0
+      ],
+      "parameters": {
+        "content": "## 3. Save and alert\n\nAdds each new listing to the sheet and sends one Slack message with the count and titles.",
+        "width": 840,
+        "height": 370,
+        "color": 7
+      }
+    },
+    {
+      "id": "n003-0000-4000-8000-000000000000",
+      "name": "Every 6 hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "position": [
+        680,
+        180
+      ]
+    },
+    {
+      "id": "n004-0000-4000-8000-000000000000",
+      "name": "Get listings",
+      "type": "n8n-nodes-parse-bot.parseBot",
+      "typeVersion": 1,
+      "parameters": {
+        "resource": "scraper",
+        "operation": "call",
+        "scraperId": "0536619e-4158-4bf0-b7cb-e487156c47ed",
+        "endpointName": "list_books",
+        "method": "GET",
+        "params": "{\"page\":1}"
+      },
+      "credentials": {
+        "parseBotApi": {
+          "id": "",
+          "name": "Parse.bot account"
+        }
+      },
+      "position": [
+        940,
+        180
+      ]
+    },
+    {
+      "id": "n005-0000-4000-8000-000000000000",
+      "name": "One item per listing",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "parameters": {
+        "fieldToSplitOut": "data.books",
+        "options": {}
+      },
+      "position": [
+        1200,
+        180
+      ]
+    },
+    {
+      "id": "n007-0000-4000-8000-000000000000",
+      "name": "Skip seen listings",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.url }}",
+        "options": {}
+      },
+      "position": [
+        1560,
+        180
+      ]
+    },
+    {
+      "id": "n009-0000-4000-8000-000000000000",
+      "name": "Save listing",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Listings"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "seen_at": "={{ $now.toISO() }}",
+            "title": "={{ $json.title }}",
+            "price": "={{ $json.price }}",
+            "url": "={{ $json.url }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "position": [
+        1920,
+        180
+      ]
+    },
+    {
+      "id": "n010-0000-4000-8000-000000000000",
+      "name": "Collect new listings",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "parameters": {
+        "aggregate": "aggregateIndividualFields",
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "title",
+              "renameField": true,
+              "outputFieldName": "titles"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        2180,
+        180
+      ]
+    },
+    {
+      "id": "n011-0000-4000-8000-000000000000",
+      "name": "Post to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "#new-listings"
+        },
+        "text": "=:new: {{ $json.titles.length }} new listing(s): {{ $json.titles.slice(0, 10).join(', ') }}",
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": "Slack account"
+        }
+      },
+      "position": [
+        2440,
+        180
+      ]
+    }
+  ],
+  "connections": {
+    "Every 6 hours": {
+      "main": [
+        [
+          {
+            "node": "Get listings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get listings": {
+      "main": [
+        [
+          {
+            "node": "One item per listing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One item per listing": {
+      "main": [
+        [
+          {
+            "node": "Skip seen listings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip seen listings": {
+      "main": [
+        [
+          {
+            "node": "Save listing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save listing": {
+      "main": [
+        [
+          {
+            "node": "Collect new listings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect new listings": {
+      "main": [
+        [
+          {
+            "node": "Post to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

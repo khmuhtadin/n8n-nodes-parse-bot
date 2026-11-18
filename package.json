@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-parse-bot",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Parse.bot web APIs for n8n and AI agents",
   "license": "MIT",
   "homepage": "https://github.com/khmuhtadin/n8n-nodes-parse-bot#readme",
